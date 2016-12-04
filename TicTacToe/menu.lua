@@ -21,7 +21,8 @@ local widget = require("widget")
 -- the scene is removed entirely (not recycled) via "composer.removeScene()"
 -- -----------------------------------------------------------------------------------
 
-local sceneGroup
+local serverButton;
+local clientButton;
 
 -- serverButtonEvent()
 --      input: none
@@ -31,6 +32,7 @@ local sceneGroup
 local function serverButtonEvent(event)
 	if ("ended" == event.phase) then
         print("server")
+        serverButton:setLabel("Waiting on client")
 		-- composer.gotoScene("server")
 	end
 end
@@ -59,11 +61,11 @@ end
 --      them to the scene group.
 function scene:create( event )
 
-    sceneGroup = self.view
+    local sceneGroup = self.view
     -- Code here runs when the scene is first created but has not yet appeared on screen
 
     -- Creating the start button, sends us from the menu scene to the game scene
-    local serverButton = widget.newButton({    
+    serverButton = widget.newButton({    
             id = "serverButton",
             label = "Create Server",    
             labelColor = { default={ 1, 1, 0 }, over={ 0, 1, 1, 0.5 } },
@@ -76,7 +78,7 @@ function scene:create( event )
         } )    
 
     -- Creating the help button, sends us from the menu scene to the help scene
-    local clientButton = widget.newButton({    
+    clientButton = widget.newButton({    
             id = "clientButton",
             label = "Join as Client",
             labelColor = { default={ 1, 1, 0 }, over={ 0, 0, 0, 0.5 } },
