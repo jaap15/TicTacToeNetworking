@@ -23,6 +23,9 @@ local widget = require("widget")
 
 local serverButton;
 local clientButton;
+local clientConnected = false;
+
+
 
 -- serverButtonEvent()
 --      input: none
@@ -33,7 +36,7 @@ local function serverButtonEvent(event)
 	if ("ended" == event.phase) then
         print("server")
         serverButton:setLabel("Waiting on client")
-		-- composer.gotoScene("server")
+		composer.gotoScene("server")
 	end
 end
 
@@ -45,7 +48,7 @@ end
 local function clientButtonEvent(event)
     if ("ended" == event.phase) then
         print("client")
-        -- composer.gotoScene("client")
+        composer.gotoScene("client")
     end
 end
 
