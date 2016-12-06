@@ -1,26 +1,20 @@
-
-local socket = require("socket")
-local game = require( "game" );
-
-
-
-
 -----------------------------------------------------------------------------------------
 --
--- menu.lua
+-- server.lua
 --
 -- Authors: Daniel Burris, Jairo Arreola
 --
--- This is the main menu.
+-- This is the server scene. We are taken here when the user presses the server button.
 -----------------------------------------------------------------------------------------
 
+-- Socket widget. Used for network connections
+local socket = require("socket")
+
+-- Game.lua contains methods and objects used to control and manpiulate the game
+local game = require( "game" )
+
 local composer = require("composer")
-
--- Scene Creation / Manipulation
 local scene = composer.newScene()
-
--- Widget Creation / Manipulation
--- Used for buttons, sliders, radio buttons
 local widget = require("widget")
 
 -- -----------------------------------------------------------------------------------
@@ -28,68 +22,79 @@ local widget = require("widget")
 -- the scene is removed entirely (not recycled) via "composer.removeScene()"
 -- -----------------------------------------------------------------------------------
 
--- local server;
--- local client;
--- local cip
--- local cport
--- local rTimer;
--- yourMove = true;
-
-
+-- setState()
+--      input: none
+--      output: none
+--      
+--      Sets and tracks the state of the game. (Whose turn it is)
 local function setState()
-
-  if yourMove then
-
-    print("Your turn")
-    game.activate();
-
-  else
-    print("Opponent's turn")
-    timer.resume(rTimer)
-    
-  end
-
+    -- The board is playable and game is activated if it is your turn
+    if yourMove then
+        game.activate()
+    else
+        -- The board is not playable or active when it is the enemies turn
+        timer.resume(rTimer)
+    end
 end
 
-
+-- waitForMove()
+--      input: none
+--      output: none
+--      
+--      This method is associated with rTimer, which is called after we make a move
+--      and now wait for the enemy to make his move. 
 function waitForMove()
 
-    print ("Waiting to receive move... ");
+    -- Do nothing, pause timer
+    print ("Waiting to receive move... ")
     timer.pause(rTimer)
-    local line, err = client:receive("*l");
-    print ("received.");
+
+    -- Waiting for communication from client
+    local line, err = client:receive("*l")
+    print ("received.")
     if client == nil then
-      print("canceling timer client == nil")
+        print("canceling timer client == nil")
     end
+
+    -- We got something from client
     if not err then
-      print ("received.");
-      -- if line == "lost" then
-      --   native.showAlert("", string.format("You lost!"), {"Exit to Menu"}, exitToMenu)
-      -- end
-      local x=tonumber(string.sub(line,1,1));
-      local y=tonumber(string.sub(line,3,3));
-      print ("Got:",x,y);
-      print ("-------------");    
-      if (game.mark(x,y) == true) then
-      game.activate();
-      yourMove = true;
-      end
-      setState();
+        print ("received.")
+        -- if line == "lost" then
+        --   native.showAlert("", string.format("You lost!"), {"Exit to Menu"}, exitToMenu)
+        -- end
 
+        -- Extract information (which board he played on)
+        local x=tonumber(string.sub(line,1,1))
+        local y=tonumber(string.sub(line,3,3))
+        print ("Got:",x,y)
+        print ("-------------")    
+
+        -- Mark the board
+        if (game.mark(x,y) == true) then
+            game.activate()
+            yourMove = true
+        end
+
+        -- Swap turns
+        setState()
     else 
-      print ("Error.")
+        print ("Error.")
     end
-
 end
 
-
+-- sendMove()
+--      input: none
+--      output: none
+--      
+--      Called with a tap listener event, sends the x,y coordinates of the slot we
+--      played on
 local function sendMove(event)
-  print("I made my move at:", event.x, event.y);
-  local sent, msg =   client:send(event.x..","..event.y.."\r\n");
+    print("I made my move at:", event.x, event.y)
+    local sent, msg =   client:send(event.x..","..event.y.."\r\n")
 
-  print("sent from server")
-  yourMove = false;
-  setState()
+    print("sent from server")
+    yourMove = false
+    setState()
 end
 
 
@@ -105,20 +110,20 @@ end
 --      them to the scene group.
 function scene:create( event )
 
-  local sceneGroup = self.view
-  -- Code here runs when the scene is first created but has not yet appeared on screen
+    local sceneGroup = self.view
+    -- Code here runs when the scene is first created but has not yet appeared on screen
 
-  yourMove = true;
-  -- local server = socket.bind("*", 20140);
-  server = assert(socket.bind("*", 20140));
-  -- Wait for connection from client
-  client = server:accept();
-  cip, cport = client:getpeername();
-  print ("connected to:", cip, ":", cport);
+    yourMove = true
 
-  rTimer = timer.performWithDelay(10, waitForMove, -1);
-  timer.pause(rTimer)
+    -- Setting up the server
+    server = assert(socket.bind("*", 20140))
+    -- Wait for connection from client
+    client = server:accept()
+    cip, cport = client:getpeername()
+    print ("connected to:", cip, ":", cport)
 
+    rTimer = timer.performWithDelay(10, waitForMove, -1)
+    timer.pause(rTimer)
 end
 
 
@@ -138,7 +143,7 @@ function scene:show( event )
 
     elseif ( phase == "did" ) then
         -- Code here runs when the scene is entirely on screen
-        Runtime:addEventListener("moved", sendMove);
+        Runtime:addEventListener("moved", sendMove)
         setState()
 
     end
