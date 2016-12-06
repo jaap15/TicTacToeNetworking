@@ -51,7 +51,7 @@ function waitForMove()
 
     -- Waiting for communication from client
     local line, err = client:receive("*l")
-    print ("received.")
+    client:settimeout(0);
     if client == nil then
         print("canceling timer client == nil")
     end
@@ -77,8 +77,9 @@ function waitForMove()
 
         -- Swap turns
         setState()
-    else 
+    else
         print ("Error.")
+        timer.resume(rTimer)
     end
 end
 
@@ -116,7 +117,8 @@ function scene:create( event )
     yourMove = true
 
     -- Setting up the server
-    server = assert(socket.bind("*", 20140))
+    -- server = assert(socket.bind("*", 20140))
+    server = socket.bind("*", 20140);
     -- Wait for connection from client
     client = server:accept()
     cip, cport = client:getpeername()

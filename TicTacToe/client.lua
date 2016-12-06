@@ -63,7 +63,7 @@ function waitForMove()
 
     -- Waiting for communication from client
     local line, err = client:receive("*l")
-    print ("received.")
+    client:settimeout(0);
     if client == nil then
         print("canceling timer client == nil")
     end
@@ -91,6 +91,7 @@ function waitForMove()
         setState()
     else 
         print ("Error.")
+        timer.resume(rTimer)
     end
 end
 
@@ -105,7 +106,7 @@ local function sendMove(event)
     print("I made my move at:", event.x, event.y)
     local sent, msg =   client:send(event.x..","..event.y.."\r\n")
 
-    print("sent from server")
+    print("sent from client")
     yourMove = false
     setState()
 end
