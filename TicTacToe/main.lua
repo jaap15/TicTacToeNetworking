@@ -5,7 +5,6 @@
 -- Authors: Daniel Burris, Jairo Arreola
 --
 -- This is our main function. Its only function is to take us into the menu scene.
-
 -----------------------------------------------------------------------------------------
 
 -- Composer object is used for the creation and manipulation of scenes

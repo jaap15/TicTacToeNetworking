@@ -4,7 +4,8 @@
 --
 -- Authors: Daniel Burris, Jairo Arreola
 --
--- This is the main menu.
+-- This is the main menu. It has two buttons on it, one taking us into the server
+-- scene and one taking us into the client scene.
 -----------------------------------------------------------------------------------------
 
 local composer = require("composer")
@@ -21,24 +22,27 @@ local widget = require("widget")
 -- the scene is removed entirely (not recycled) via "composer.removeScene()"
 -- -----------------------------------------------------------------------------------
 
-local serverButton;
-local clientButton;
-local clientConnected = false;
+-- Representing our two buttons
+local serverButton
+local clientButton
 
-server = nil;
-client = nil;
-cip = nil;
-cport = nil;
-rTimer = nil;
-yourMove = nil;
+-- Connection Status variable
+local clientConnected = false
 
-
+-- Connection Variables
+server = nil
+client = nil
+cip = nil
+cport = nil
+rTimer = nil
+yourMove = nil
 
 -- serverButtonEvent()
 --      input: none
 --      output: none
 --      
---      This function just switches from the menu scene to the server scene
+--      This function executes when we press the server button. It will call a function
+--      that waits for the client to connect to it. 
 local function serverButtonEvent(event)
 	if ("ended" == event.phase) then
         print("server")
@@ -51,7 +55,8 @@ end
 --      input: none
 --      output: none
 --      
---      This function just switches from the menu scene to the client scene
+--      This function executes when we press the client button. It will call a function that
+--      connects to the server. Be sure to press this button after you have pressed the server.
 local function clientButtonEvent(event)
     if ("ended" == event.phase) then
         print("client")
@@ -74,7 +79,7 @@ function scene:create( event )
     local sceneGroup = self.view
     -- Code here runs when the scene is first created but has not yet appeared on screen
 
-    -- Creating the start button, sends us from the menu scene to the game scene
+    -- Creating the server button, creates the server
     serverButton = widget.newButton({    
             id = "serverButton",
             label = "Create Server",    
@@ -87,7 +92,7 @@ function scene:create( event )
             onEvent = serverButtonEvent 
         } )    
 
-    -- Creating the help button, sends us from the menu scene to the help scene
+    -- Creating the client button, creates the client
     clientButton = widget.newButton({    
             id = "clientButton",
             label = "Join as Client",

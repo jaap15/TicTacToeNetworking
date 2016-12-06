@@ -5,10 +5,10 @@ function piece:new (type, x, y)    --constructor
   self.__index = self;
   o.type = type;
   if (type == 0) then
-  	o.shape = display.newCircle (x,y, 50);
+  	o.shape = display.newCircle (x,y, display.contentWidth/10.8);
   	o.shape:setFillColor (1,0,0);
   else
-  	o.shape = display.newRect (x,y, 100, 100);
+  	o.shape = display.newRect (x,y, display.contentWidth/5.4, display.contentHeight/10.8);
   	o.shape.rotation= 45;
   	o.shape:setFillColor (0,0,1);
   end
