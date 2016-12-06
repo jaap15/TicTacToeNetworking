@@ -25,6 +25,13 @@ local serverButton;
 local clientButton;
 local clientConnected = false;
 
+server = nil;
+client = nil;
+cip = nil;
+cport = nil;
+rTimer = nil;
+yourMove = nil;
+
 
 
 -- serverButtonEvent()

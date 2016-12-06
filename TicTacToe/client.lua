@@ -29,62 +29,72 @@ local widget = require("widget")
 
 
 local ip
-local cip
-local cport
+-- local cip
+-- local cport
 
-local server;
-local client;
-local buttons;
--- local sBtn;
--- local cBtn;
+-- local server;
+-- local client;
 
-local rTimer;
-local yourMove = false;
+-- local rTimer;
+-- yourMove = false;
+
+
+local function setState()
+
+  if yourMove then
+
+    print("Your turn")
+    game.activate();
+
+  else
+    print("Opponent's turn")
+    timer.resume(rTimer)
+    
+  end
+
+end
 
 
 function waitForMove()
   
-
-  -- if not yourMove then
     print ("Waiting to receive move... ");
-    -- timer.cancel(rTimer)
+    timer.pause(rTimer)
     local line, err = client:receive("*l");
-    -- local line, err = client:receive();
-    -- print ("received.");
 
     if client == nil then
       print("canceling timer client == nil")
-      -- timer.cancel(rTimer)
     end
     if not err then
       print ("received.");
-      -- timer.cancel(rTimer)
+      -- if line == "lost" then
+      --   native.showAlert("", string.format("You lost!"), {"Exit to Menu"}, exitToMenu)
+      -- end
       local x=tonumber(string.sub(line,1,1));
       local y=tonumber(string.sub(line,3,3));
       print ("Got:",x,y);
       print ("-------------");    
-      game.mark(x,y);
-      -- game.activate();
-      -- yourMove = true;
-      -- waitForMove()
+      if (game.mark(x,y) == true) then
+      game.activate();
+      yourMove = true;
+      end
+      setState();
     else 
       print ("Error.")
     end
-  -- end
+
 end
 
 
 local function sendMove(event)
 
-  -- if yourMove then
-
     print("I made my move at:", event.x, event.y);
     local sent, msg =   client:send(event.x..","..event.y.."\r\n");
 
-  -- else
-  --   -- waitForMove();
-  --   rTimer = timer.performWithDelay(10, waitForMove, -1);
-  -- end
+
+    print("sent from server")
+    yourMove = false;
+    setState()
+
 end
 
 
@@ -102,19 +112,17 @@ function scene:create( event )
 
   local sceneGroup = self.view
   -- Code here runs when the scene is first created but has not yet appeared on screen
-
-  -- local server = socket.bind("*", 20140);
-  -- server = assert(socket.bind("*", 20140));
-  -- Wait for connection from client
-  -- client = server:accept();
-  -- local cip, cport = client:getpeername();
-  -- print ("connected to:", cip, ":", cport);
+  yourMove = false;
 
   -- connect to a TCP server
   ip = "localhost";
   client = socket.connect(ip,20140);
   cip, cport = client:getpeername();
   print ("connected to host at:", cip, ":", cport);
+
+
+  rTimer = timer.performWithDelay(10, waitForMove, -1);
+  timer.pause(rTimer)
 
 end
 
@@ -136,8 +144,7 @@ function scene:show( event )
     elseif ( phase == "did" ) then
         -- Code here runs when the scene is entirely on screen
         Runtime:addEventListener("moved", sendMove);
-        -- waitForMove();
-        rTimer = timer.performWithDelay(10, waitForMove, -1);
+        setState()
 
     end
 end

@@ -28,42 +28,13 @@ local widget = require("widget")
 -- the scene is removed entirely (not recycled) via "composer.removeScene()"
 -- -----------------------------------------------------------------------------------
 
-local server;
-local client;
--- local buttons;
--- local sBtn;
--- local cBtn;
-local cip
-local cport
-local rTimer;
-local yourMove = true;
+-- local server;
+-- local client;
+-- local cip
+-- local cport
+-- local rTimer;
+-- yourMove = true;
 
-
-function waitForMove()
-
-  -- if not yourMove then
-    print ("Waiting to receive move... ");
-    local line, err = client:receive('*l');
-    -- local line, err = client:receive(512);
-    print ("received.");
-    if client == nil then
-      print("canceling timer client == nil")
-      -- timer.cancel(rTimer)
-    end
-    if not err then
-      -- timer.cancel(rTimer)
-      local x=tonumber(string.sub(line,1,1));
-      local y=tonumber(string.sub(line,3,3));
-      print ("Got:",x,y);
-      print ("-------------");    
-      game.mark(x,y);
-      game.activate();
-    else 
-      print ("Error.")
-    end
-  -- end
-
-end
 
 local function setState()
 
@@ -72,24 +43,53 @@ local function setState()
     print("Your turn")
     game.activate();
 
-    -- Runtime:addEventListener("moved", sendMove);
-
-
   else
-
     print("Opponent's turn")
+    timer.resume(rTimer)
+    
   end
 
 end
+
+
+function waitForMove()
+
+    print ("Waiting to receive move... ");
+    timer.pause(rTimer)
+    local line, err = client:receive("*l");
+    print ("received.");
+    if client == nil then
+      print("canceling timer client == nil")
+    end
+    if not err then
+      print ("received.");
+      -- if line == "lost" then
+      --   native.showAlert("", string.format("You lost!"), {"Exit to Menu"}, exitToMenu)
+      -- end
+      local x=tonumber(string.sub(line,1,1));
+      local y=tonumber(string.sub(line,3,3));
+      print ("Got:",x,y);
+      print ("-------------");    
+      if (game.mark(x,y) == true) then
+      game.activate();
+      yourMove = true;
+      end
+      setState();
+
+    else 
+      print ("Error.")
+    end
+
+end
+
 
 local function sendMove(event)
   print("I made my move at:", event.x, event.y);
   local sent, msg =   client:send(event.x..","..event.y.."\r\n");
 
   print("sent from server")
+  yourMove = false;
   setState()
-  -- waitForMove();
-  -- rTimer = timer.performWithDelay(10, waitForMove, -1);
 end
 
 
@@ -108,35 +108,17 @@ function scene:create( event )
   local sceneGroup = self.view
   -- Code here runs when the scene is first created but has not yet appeared on screen
 
+  yourMove = true;
   -- local server = socket.bind("*", 20140);
   server = assert(socket.bind("*", 20140));
   -- Wait for connection from client
   client = server:accept();
-  -- local cip, cport = client:getpeername();
-  -- print ("connected to:", cip, ":", cport);
   cip, cport = client:getpeername();
   print ("connected to:", cip, ":", cport);
 
+  rTimer = timer.performWithDelay(10, waitForMove, -1);
+  timer.pause(rTimer)
 
-  -- game.setPlayer(0);
-
-  -- buttons = display.newGroup();
-
-  -- sBtn = display.newRect (buttons, 30,0,35,20 );
-  -- sBtn:setFillColor(0,0.5,0);
-  -- display.newText(buttons, "Host", 30, 0,native.systemFont,15);
-
-  -- cBtn = display.newRect (buttons, 80,0,40,20 );
-  -- cBtn:setFillColor(0,0.5,0);
-  -- display.newText(buttons, "Guest", 80,0,native.systemFont,15);
-
-    -- Adding all objects to the scene group, this will bind these object to the scene
-    -- and they will be removed / replaced when switching to and from scenes
-    -- sceneGroup:insert( server )
-    -- sceneGroup:insert( client )
-    -- sceneGroup:insert( buttons )
-    -- sceneGroup:insert( sBtn )
-    -- sceneGroup:insert( cBtn )
 end
 
 
@@ -156,12 +138,8 @@ function scene:show( event )
 
     elseif ( phase == "did" ) then
         -- Code here runs when the scene is entirely on screen
-        -- sBtn:addEventListener("tap", gameStart);
-        -- cBtn:addEventListener("tap", gameStart);
         Runtime:addEventListener("moved", sendMove);
-        game.activate();
-        -- rTimer = timer.performWithDelay(500, waitForMove, -1);
-        -- rTimer = timer.performWithDelay(500, setState, -1);
+        setState()
 
     end
 end
