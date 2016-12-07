@@ -69,7 +69,7 @@ function waitForMove()
     timer.pause(rTimer)
     -- Waiting for communication from client
     local line, err = client:receive("*l")
-    client:settimeout(1);
+    client:settimeout(0);
     if client == nil then
         print("canceling timer client == nil")
     end
