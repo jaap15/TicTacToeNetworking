@@ -147,6 +147,7 @@ function scene:create( event )
         print("Unable to send from server side")
     end
 
+    game.draw()
 end
 
 

@@ -146,6 +146,7 @@ function scene:create( event )
     print("Unable to receive on client side")
   end
 
+  game.draw()
 end
 
 
