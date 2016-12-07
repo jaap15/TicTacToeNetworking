@@ -148,6 +148,9 @@ end
 --      Called when its the users turn
 function game.activate ()
     zone:addEventListener("tap", zoneHandler)
+end
+
+function game.draw()
     zone.isVisible = true
     ver.isVisible = true
     hor.isVisible = true
