@@ -30,6 +30,7 @@ local widget = require("widget")
 local function setState()
     -- The board is playable and game is activated if it is your turn
 
+    game.checkWin()
     -- sendMove()
     --      input: none
     --      output: none
@@ -98,6 +99,7 @@ function waitForMove()
         print ("Error.")
         timer.resume(rTimer)
     end
+    game.checkWin()
 end
 
 -- -----------------------------------------------------------------------------------
@@ -116,8 +118,6 @@ function scene:create( event )
     -- Code here runs when the scene is first created but has not yet appeared on screen
 
     yourMove = true
-
-    print("######################################################")
 
     -- Setting up the server
     -- server = assert(socket.bind("*", 20140))

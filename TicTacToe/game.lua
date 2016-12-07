@@ -69,7 +69,7 @@ function exitToMenu(event)
     board = {{-1,-1,-1},{-1,-1,-1},{-1,-1,-1}}
     player = 0
     gamePieces = {}
-    
+
     composer.gotoScene("menu")
 end
 
@@ -188,6 +188,33 @@ function game.mark (x,y)
     player = (player + 1) % 2
 
     return true
+end
+
+function game.checkWin() 
+    -- Checking columns for win conditions (3 in a row)
+    for i=1, 3 do
+        if (board[i][1] == board[i][2] and board[i][1] == board[i][3] and board[i][1] ~= -1) then
+            -- local sent, msg =   client:send("lost".."\r\n")
+            native.showAlert("", string.format("Player %01d wins!", board[i][1]), {"Exit to Menu"}, exitToMenu)
+        end
+    end
+
+    -- Checking rows for win conditions (3 in a row)
+    for i=1, 3 do
+        if (board[1][i] == board[2][i] and board[1][i] == board[3][i] and board[1][i] ~= -1) then
+            -- local sent, msg =   client:send("lost".."\r\n")
+            native.showAlert("", string.format("Player %01d wins!", board[1][i]), {"Exit to Menu"}, exitToMenu)
+        end
+    end
+
+    -- Checking diagonals for win conditions (3 in a row)
+    if (board[1][1] == board[2][2] and board[1][1] == board[3][3] and board[1][1] ~= -1) then
+        -- local sent, msg =   client:send("lost".."\r\n")
+        native.showAlert("Congratulations!", string.format("Player %01d wins!", board[1][1]), {"Exit to Menu"}, exitToMenu)
+    elseif (board[3][1] == board[2][2] and board[3][1] == board[1][3] and board[3][1] ~= -1) then
+        -- local sent, msg =   client:send("lost".."\r\n")
+        native.showAlert("", string.format("Player %01d wins!", board[3][1]), {"Exit to Menu"}, exitToMenu)
+    end
 end
 
 return game
