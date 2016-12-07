@@ -24,6 +24,10 @@ local gamePieces = {}
 -- Drawing the game board according to screen resolution
 -- ------------------------------------------------------
 -- Drawing the whole board, based on screen resolution
+local zone
+local ver
+local hor
+
 local zone = display.newRect (display.contentCenterX, display.contentCenterY, display.contentWidth/1.2, display.contentHeight/1.2)
 zone.strokeWidth = 2
 zone:setFillColor(0,0.2,0)
@@ -53,14 +57,19 @@ function exitToMenu(event)
 
     -- Removing objects
     print("removing objects")
-    zone:removeSelf()
-    ver:removeSelf()
-    hor:removeSelf()
+    zone.isVisible = false
+    ver.isVisible = false
+    hor.isVisible = false
 
     for i = 1, #gamePieces do
         gamePieces[i]:remove()
     end
 
+    -- Reseting the board / player / pieces
+    board = {{-1,-1,-1},{-1,-1,-1},{-1,-1,-1}}
+    player = 0
+    gamePieces = {}
+    
     composer.gotoScene("menu")
 end
 
@@ -134,9 +143,12 @@ end
 --      input: none
 --      output: none
 --
---      FIXFIX idk when this is called
+--      Called when its the users turn
 function game.activate ()
     zone:addEventListener("tap", zoneHandler)
+    zone.isVisible = true
+    ver.isVisible = true
+    hor.isVisible = true
 end
 
 -- game.mark()
