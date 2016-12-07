@@ -103,6 +103,8 @@ function checkWin()
         -- local sent, msg =   client:send("lost".."\r\n")
         native.showAlert("", string.format("Player %01d wins!", board[3][1]), {"Exit to Menu"}, exitToMenu)
     end
+
+
 end
 
 -- zoneHandler()
@@ -215,6 +217,27 @@ function game.checkWin()
         -- local sent, msg =   client:send("lost".."\r\n")
         native.showAlert("", string.format("Player %01d wins!", board[3][1]), {"Exit to Menu"}, exitToMenu)
     end
+
+    local allBoardUsed = false;
+
+    for i=1, 3 do
+
+        for j = 1, 3 do
+            if (board[i][j] ~= -1) then
+                allBoardUsed = true;
+            else
+                allBoardUsed = false;
+            end
+        end
+
+    end
+
+    if allBoardUsed then
+        native.showAlert("Draw!", string.format("Draw!"), {"Exit to Menu"}, exitToMenu)
+    end
+
+
+
 end
 
 return game
