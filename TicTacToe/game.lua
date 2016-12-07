@@ -73,12 +73,12 @@ function exitToMenu(event)
     composer.gotoScene("menu")
 end
 
--- checkWin()
+-- game.checkWin()
 --      input: none
 --      output: none
 --
 --      Checks win conditions for columns, rows, and diagonals
-function checkWin() 
+function game.checkWin() 
     -- Checking columns for win conditions (3 in a row)
     for i=1, 3 do
         if (board[i][1] == board[i][2] and board[i][1] == board[i][3] and board[i][1] ~= -1) then
@@ -104,8 +104,31 @@ function checkWin()
         native.showAlert("", string.format("Player %01d wins!", board[3][1]), {"Exit to Menu"}, exitToMenu)
     end
 
+    local allBoardUsed = true;
+
+    for i=1, 3 do
+        local current = false;
+        for j = 1, 3 do
+            if (board[i][j] ~= -1) then
+                current = true;
+            else
+                current = false;
+            end
+            allBoardUsed = allBoardUsed and current;
+        end
+
+    end
+
+    if allBoardUsed then
+        native.showAlert("Draw!", string.format("Draw!"), {"Exit to Menu"}, exitToMenu)
+    end
+
+
 
 end
+
+
+
 
 -- zoneHandler()
 --      input: none
@@ -137,7 +160,7 @@ local function zoneHandler(event)
     Runtime:dispatchEvent({name="moved", x=x, y=y}) 
 
     -- Check to see if anyone won after this move 
-    checkWin()
+    game.checkWin() 
 end
 -- zone:addEventListener("tap", zoneHandler)
 
@@ -192,53 +215,6 @@ function game.mark (x,y)
     return true
 end
 
-function game.checkWin() 
-    -- Checking columns for win conditions (3 in a row)
-    for i=1, 3 do
-        if (board[i][1] == board[i][2] and board[i][1] == board[i][3] and board[i][1] ~= -1) then
-            -- local sent, msg =   client:send("lost".."\r\n")
-            native.showAlert("", string.format("Player %01d wins!", board[i][1]), {"Exit to Menu"}, exitToMenu)
-        end
-    end
 
-    -- Checking rows for win conditions (3 in a row)
-    for i=1, 3 do
-        if (board[1][i] == board[2][i] and board[1][i] == board[3][i] and board[1][i] ~= -1) then
-            -- local sent, msg =   client:send("lost".."\r\n")
-            native.showAlert("", string.format("Player %01d wins!", board[1][i]), {"Exit to Menu"}, exitToMenu)
-        end
-    end
-
-    -- Checking diagonals for win conditions (3 in a row)
-    if (board[1][1] == board[2][2] and board[1][1] == board[3][3] and board[1][1] ~= -1) then
-        -- local sent, msg =   client:send("lost".."\r\n")
-        native.showAlert("Congratulations!", string.format("Player %01d wins!", board[1][1]), {"Exit to Menu"}, exitToMenu)
-    elseif (board[3][1] == board[2][2] and board[3][1] == board[1][3] and board[3][1] ~= -1) then
-        -- local sent, msg =   client:send("lost".."\r\n")
-        native.showAlert("", string.format("Player %01d wins!", board[3][1]), {"Exit to Menu"}, exitToMenu)
-    end
-
-    local allBoardUsed = true;
-
-    for i=1, 3 do
-        local current = false;
-        for j = 1, 3 do
-            if (board[i][j] ~= -1) then
-                current = true;
-            else
-                current = false;
-            end
-            allBoardUsed = allBoardUsed and current;
-        end
-
-    end
-
-    if allBoardUsed then
-        native.showAlert("Draw!", string.format("Draw!"), {"Exit to Menu"}, exitToMenu)
-    end
-
-
-
-end
 
 return game
