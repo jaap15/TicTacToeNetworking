@@ -218,16 +218,17 @@ function game.checkWin()
         native.showAlert("", string.format("Player %01d wins!", board[3][1]), {"Exit to Menu"}, exitToMenu)
     end
 
-    local allBoardUsed = false;
+    local allBoardUsed = true;
 
     for i=1, 3 do
-
+        local current = false;
         for j = 1, 3 do
             if (board[i][j] ~= -1) then
-                allBoardUsed = true;
+                current = true;
             else
-                allBoardUsed = false;
+                current = false;
             end
+            allBoardUsed = allBoardUsed and current;
         end
 
     end
