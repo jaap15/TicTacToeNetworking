@@ -24,14 +24,6 @@ local widget = require("widget")
 
 -- Where are we connecting to?
 local ip
--- local cip
--- local cport
-
--- local server
--- local client
-
--- local rTimer
--- yourMove = false
 
 -- setState()
 --      input: none
@@ -40,7 +32,23 @@ local ip
 --      Sets and tracks the state of the game. (Whose turn it is)
 local function setState()
     -- The board is playable and game is activated if it is your turn
+
+    -- sendMove()
+    --      input: none
+    --      output: none
+    --      
+    --      Called with a tap listener event, sends the x,y coordinates of the slot we
+    --      played on
+    local function sendMove(event)
+        print("I made my move at:", event.x, event.y)
+        local sent, msg =   client:send(event.x..","..event.y.."\r\n")
+
+        print("sent from client")
+        yourMove = false
+        setState()
+    end
     if yourMove then
+        Runtime:addEventListener("moved", sendMove)
         game.activate()
     else
         -- The board is not playable or active when it is the enemies turn
@@ -60,10 +68,9 @@ function waitForMove()
     -- Do nothing, pause timer
     print ("Waiting to receive move... ")
     timer.pause(rTimer)
-
     -- Waiting for communication from client
     local line, err = client:receive("*l")
-    client:settimeout(0);
+    client:settimeout(1);
     if client == nil then
         print("canceling timer client == nil")
     end
@@ -95,22 +102,6 @@ function waitForMove()
     end
 end
 
-
--- sendMove()
---      input: none
---      output: none
---      
---      Called with a tap listener event, sends the x,y coordinates of the slot we
---      played on
-local function sendMove(event)
-    print("I made my move at:", event.x, event.y)
-    local sent, msg =   client:send(event.x..","..event.y.."\r\n")
-
-    print("sent from client")
-    yourMove = false
-    setState()
-end
-
 -- -----------------------------------------------------------------------------------
 -- Scene event functions
 -- -----------------------------------------------------------------------------------
@@ -135,6 +126,24 @@ function scene:create( event )
 
   rTimer = timer.performWithDelay(10, waitForMove, -1)
   timer.pause(rTimer)
+
+  --test connection
+  local line, err = client:receive("*l")
+
+  if not err then
+    print(line);
+    local sent, msg =   client:send("sent from client".."\r\n")
+
+    if sent then
+        print("Message sent")
+    else
+        print("Unable to send from client side")
+    end
+
+  else
+    print("Unable to receive on client side")
+  end
+
 end
 
 
@@ -154,7 +163,6 @@ function scene:show( event )
 
     elseif ( phase == "did" ) then
         -- Code here runs when the scene is entirely on screen
-        Runtime:addEventListener("moved", sendMove)
         setState()
 
     end
@@ -173,6 +181,7 @@ function scene:hide( event )
 
     if ( phase == "will" ) then
         -- Code here runs when the scene is on screen (but is about to go off screen)
+        client:close()
 
     elseif ( phase == "did" ) then
         -- Code here runs immediately after the scene goes entirely off screen

@@ -56,11 +56,6 @@ function exitToMenu(event)
     ver:removeSelf()
     hor:removeSelf()
 
-    -- Closing connections
-    print("closing connections")
-    server:close()
-    print("closing client")
-    client:close()
     composer.gotoScene("menu")
 end
 
@@ -111,7 +106,6 @@ local function zoneHandler(event)
     local x, y = event.target:contentToLocal(event.x, event.y)
     x = x + (display.contentWidth/2.4)
     y = y + (display.contentHeight/2.4)
-
     x = math.ceil( x/(display.contentWidth/3.6))
     y = math.ceil( y/(display.contentHeight/3.6))
 
@@ -129,7 +123,7 @@ local function zoneHandler(event)
     -- Check to see if anyone won after this move 
     checkWin()
 end
-zone:addEventListener("tap", zoneHandler)
+-- zone:addEventListener("tap", zoneHandler)
 
 -- game.activate()
 --      input: none
@@ -154,7 +148,7 @@ function game.mark (x,y)
     end
 
     -- Logically mark the board
-    board[x][y] = player 
+    -- board[x][y] = player 
 
     -- Physically place the peice on the board
     local _x = 0
@@ -168,6 +162,7 @@ function game.mark (x,y)
 
     -- Placing the peice at specified + calculated coordinates
     piece:new(player, _x, _y)	
+    board[x][y] = player
     player = (player + 1) % 2
 
     return true
