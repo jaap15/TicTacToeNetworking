@@ -159,7 +159,7 @@ function scene:show( event )
 
     if ( phase == "will" ) then
         -- Code here runs when the scene is still off screen (but is about to come on screen)
-        -- holds all of the enemy objects that the player will battle
+        composer.removeScene("menu")
 
     elseif ( phase == "did" ) then
         -- Code here runs when the scene is entirely on screen
@@ -182,6 +182,7 @@ function scene:hide( event )
     if ( phase == "will" ) then
         -- Code here runs when the scene is on screen (but is about to go off screen)
         client:close()
+        composer.removeScene("client")
 
     elseif ( phase == "did" ) then
         -- Code here runs immediately after the scene goes entirely off screen

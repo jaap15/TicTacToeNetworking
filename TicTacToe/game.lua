@@ -19,6 +19,7 @@ local composer = require("composer")
 -- Game board logical struct = 3x3 matrix
 local board = {{-1,-1,-1},{-1,-1,-1},{-1,-1,-1}}
 local player = 0 -- Swaps between 0 and 1, represents the player
+local gamePieces = {}
 
 -- Drawing the game board according to screen resolution
 -- ------------------------------------------------------
@@ -55,6 +56,10 @@ function exitToMenu(event)
     zone:removeSelf()
     ver:removeSelf()
     hor:removeSelf()
+
+    for i = 1, #gamePieces do
+        gamePieces[i]:remove()
+    end
 
     composer.gotoScene("menu")
 end
@@ -160,8 +165,13 @@ function game.mark (x,y)
     _x = ((x-1)*((display.contentWidth/1.2)/3))+xgaps +(display.contentWidth/7.2)
     _y = ((y-1)*((display.contentHeight/1.2)/3))+ygaps  +(display.contentHeight/7.2)
 
+    local i = #gamePieces
+    i = i + 1
+
     -- Placing the peice at specified + calculated coordinates
-    piece:new(player, _x, _y)	
+    gamePieces[i] = piece:new()   
+    print("Creating peice # " .. i)
+    gamePieces[i]:create(i, player, _x, _y)
     board[x][y] = player
     player = (player + 1) % 2
 
